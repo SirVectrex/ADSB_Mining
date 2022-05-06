@@ -4,28 +4,23 @@ from opensky_api import OpenSkyApi
 import time as t
 import csv
 
+
+
 # open the file in the write mode
-f = open('26R.csv', 'w')  # northern runway
-f = open('26L.csv', 'w')  # southern runway
+f = open('26R.csv', 'a', newline='')  # northern runway
+f = open('26L.csv', 'a', newline='')  # southern runway
 
 # define bbox
 northrunway = (48.355026, 48.374598, 11.741354, 11.838376)
 southrunway = (48.332477, 48.354276, 11.705034, 11.833045)
 
-User =
-pw =
+User = "Vectrex"
+pw = "5gs@CVHudMHzQCb"
 
 api = OpenSkyApi(User, pw)
 
 
-# get runway data in a loop
-def get_north_runway_data():
-    while True:
-        states = api.get_states(time_secs=t.time(), bbox=(48.355026, 48.374598, 11.741354, 11.838376))
-        if states is not None:
-            print(states)
-            write_northern_csv(states);
-        t.sleep(1)
+
 
 
 def startcollecting(runway):
@@ -40,15 +35,23 @@ def startcollecting(runway):
             print("\nExiting...")
             break
 
+# get runway data in a loop
+def get_north_runway_data():
+    while True:
+        states = api.get_states(time_secs=t.time(), bbox=northrunway)
+        if states is not None:
+            print(states)
+            write_northern_csv(states);
+        t.sleep(5)
 
 # get runway data in a loop
 def get_south_runway_data():
     while True:
-        states = api.get_states(time_secs=t.time(), bbox=(48.332477, 48.354276, 11.705034, 11.833045))
+        states = api.get_states(time_secs=t.time(), bbox=southrunway)
         if states is not None:
             print(states)
             write_southern_csv(states);
-        t.sleep(1)
+        t.sleep(5)
 
 
 def MUC_northernrunway_curr():
@@ -59,7 +62,6 @@ def MUC_northernrunway_curr():
         if states is not None:
             print(states)
         t.sleep(1)
-        time = time - 5
 
     return -1;
 
@@ -87,33 +89,55 @@ def MUC_southernrunway():
             print(states)
         t.sleep(1)
         time = time - 5
-
     return -1;
-
-    return -1;
-
 
 # write northern runway data to file
 def write_northern_csv(states):
-    with open('26R.csv', 'w') as csvfile:
-        fieldnames = ['latitude', 'longitude', 'baro_altitude', 'velocity']
+    with open('26R.csv', 'a', newline='') as csvfile:
+        fieldnames = ['icao24', 'flightnumber', 'Country', 'Timestamp', 'latitude', 'longitude', 'baro_altitude', 'vertical_rate', 'on_ground', 'runway', 'state']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+        #writer.writeheader()
         for s in states.states:
-            writer.writerow({'latitude': s.latitude, 'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
-                             'velocity': s.velocity})
+            # append row to csv
+            if(s.callsign != None):
+                if(s.vertical_rate > 0 and s.on_ground == False):
+                    pos = "Takeoff"
+                elif(s.vertical_rate < 0 and s.on_ground == False):
+                    pos = "Landing"
+                else:
+                    pos = "Ground"
+                writer.writerow({'icao24': s.icao24, 'flightnumber': s.callsign, 'Country': s.origin_country,
+                             'Timestamp': unix_to_timestamp(s.last_contact), 'latitude': s.latitude,
+                             'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
+                             'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26R','state': pos})
     return -1;
 
 
 # write southern runway data to file
 def write_southern_csv(states):
-    with open('26L.csv', 'w') as csvfile:
-        fieldnames = ['latitude', 'longitude', 'baro_altitude', 'velocity']
+    with open('26L.csv', 'a', newline='') as csvfile:
+        fieldnames = ['icao24', 'flightnumber', 'Country', 'Timestamp', 'latitude', 'longitude', 'baro_altitude',
+                      'vertical_rate', 'on_ground', 'runway', 'state']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+        #writer.writeheader()
         for s in states.states:
-            writer.writerow({'latitude': s.latitude, 'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
-                             'velocity': s.velocity})
+            # append row to csv
+            if(s.callsign != None and s.callsign != ""):
+                if(s.vertical_rate != None and s.on_ground != None):
+                    if(s.vertical_rate > 0 and s.on_ground == False):
+                        pos = "Takeoff"
+                    elif(s.vertical_rate < 0 and s.on_ground == False):
+                        pos = "Landing"
+                    else:
+                        pos = "Ground"
+
+                else:
+                    pos = "Not Avail."
+                if(pos != "Not Avail." and pos != "Ground"):
+                    writer.writerow({'icao24': s.icao24, 'flightnumber': s.callsign, 'Country': s.origin_country,
+                             'Timestamp': unix_to_timestamp(s.last_contact), 'latitude': s.latitude,
+                             'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
+                             'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26R','state': pos})
     return -1;
 
 
@@ -126,9 +150,12 @@ def test():
         states = api.get_states(time_secs=time, bbox=(48.355026, 48.374598, 11.741354, 11.838376))
 
         if states is not None:
-            print(states)
+            print(states.states[0])
         t.sleep(1)
         time = time - 5
     # for s in states.states:
     #    print("(%r, %r, %r, %r)" % (s.longitude, s.latitude, s.baro_altitude, s.velocity))
     return -1;
+
+def unix_to_timestamp(unix_time):
+    return t.strftime("%Y-%m-%d %H:%M:%S", t.localtime(unix_time))
