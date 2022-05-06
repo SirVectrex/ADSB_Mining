@@ -10,6 +10,7 @@ Please install requirements using:
 ```shell
 $ pip install -r requirements.txt
 ```
+and install the OpenSkyPackage manually as described here: [Github Readme](https://github.com/openskynetwork/opensky-api)
 
 Run the App with:
 ```shell
