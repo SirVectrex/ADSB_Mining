@@ -1,7 +1,8 @@
-# Flightradar24 Data Analytics
+# ADSB Data Analytics
 
 ### Features
-Pretty much none yet - Coming Soon
+Printing JSON Answers from FR24 API - Business Subscription required.
+Receiving flights in Munich - seperated by runway
 
 ### Usage
 
@@ -13,4 +14,9 @@ $ pip install -r requirements.txt
 Run the App with:
 ```shell
 $ streamlit run .\app\app.py
+```
+
+Run the Console App with:
+```shell
+$ node server.js
 ```
