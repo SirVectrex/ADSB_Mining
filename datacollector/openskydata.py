@@ -1,9 +1,6 @@
-from unittest import case
-
 from opensky_api import OpenSkyApi
 import time as t
 import csv
-
 
 
 # open the file in the write mode
@@ -14,23 +11,22 @@ f = open('26L.csv', 'a', newline='')  # southern runway
 northrunway = (48.355026, 48.374598, 11.741354, 11.838376)
 southrunway = (48.332477, 48.354276, 11.705034, 11.833045)
 
-User = "Vectrex"
-pw = "5gs@CVHudMHzQCb"
+User = 
 
 api = OpenSkyApi(User, pw)
-
-
-
-
 
 def startcollecting(runway):
     # loop with user interrupt
     while True:
         try:
             if runway == "northern":
-                get_north_runway_data()
+                # if time is between the 5am and 10pm time, get the data
+                if t.localtime().tm_hour >= 5 and t.localtime().tm_hour <= 22:
+                    get_north_runway_data()
             elif runway == "southern":
-                get_south_runway_data()
+                # if time is between the 5am and 10pm time, get the data
+                if t.localtime().tm_hour >= 5 and t.localtime().tm_hour <= 22:
+                    get_south_runway_data()
         except KeyboardInterrupt:
             print("\nExiting...")
             break
@@ -40,9 +36,24 @@ def get_north_runway_data():
     while True:
         states = api.get_states(time_secs=t.time(), bbox=northrunway)
         if states is not None:
-            print(states)
+            print("north:    "+ str(states))
             write_northern_csv(states);
         t.sleep(5)
+
+def get_north_runway_once():
+    states = api.get_states(bbox=northrunway)
+    if states is not None:
+        print("north:    " + str(states))
+        write_northern_csv(states);
+    return -1;
+
+def get_south_runway_once():
+    states = api.get_states(bbox=southrunway)
+    if states is not None:
+        print("south:    " + str(states))
+        write_southern_csv(states);
+    return -1;
+
 
 # get runway data in a loop
 def get_south_runway_data():
@@ -93,7 +104,7 @@ def MUC_southernrunway():
 
 # write northern runway data to file
 def write_northern_csv(states):
-    with open('26R.csv', 'a', newline='') as csvfile:
+    with open('./26R.csv', 'a', newline='') as csvfile:
         fieldnames = ['icao24', 'flightnumber', 'Country', 'Timestamp', 'latitude', 'longitude', 'baro_altitude', 'vertical_rate', 'on_ground', 'runway', 'state']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         #writer.writeheader()
@@ -115,7 +126,7 @@ def write_northern_csv(states):
 
 # write southern runway data to file
 def write_southern_csv(states):
-    with open('26L.csv', 'a', newline='') as csvfile:
+    with open('./26L.csv', 'a', newline='') as csvfile:
         fieldnames = ['icao24', 'flightnumber', 'Country', 'Timestamp', 'latitude', 'longitude', 'baro_altitude',
                       'vertical_rate', 'on_ground', 'runway', 'state']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -137,7 +148,7 @@ def write_southern_csv(states):
                     writer.writerow({'icao24': s.icao24, 'flightnumber': s.callsign, 'Country': s.origin_country,
                              'Timestamp': unix_to_timestamp(s.last_contact), 'latitude': s.latitude,
                              'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
-                             'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26R','state': pos})
+                             'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26L','state': pos})
     return -1;
 
 
