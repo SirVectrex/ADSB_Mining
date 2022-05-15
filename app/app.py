@@ -6,6 +6,7 @@ st.write("")
 st.title("ADSB Analytics")
 st.write(
     "Instant Access to collected Data in CSV format.\n"
+    "Fligtradar Datagathering is currently disabled.\n"
 )
 
 
