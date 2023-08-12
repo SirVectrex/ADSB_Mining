@@ -1,6 +1,7 @@
-from opensky_api import OpenSkyApi
 import time as t
 import csv
+
+from opensky_api import OpenSkyApi
 
 
 # open the file in the write mode
@@ -11,9 +12,7 @@ f = open('26L.csv', 'a', newline='')  # southern runway
 northrunway = (48.355026, 48.374598, 11.741354, 11.838376)
 southrunway = (48.332477, 48.354276, 11.705034, 11.833045)
 
-User = 
-
-api = OpenSkyApi(User, pw)
+api = OpenSkyApi()
 
 def startcollecting(runway):
     # loop with user interrupt
@@ -41,6 +40,7 @@ def get_north_runway_data():
         t.sleep(5)
 
 def get_north_runway_once():
+    print(api)
     states = api.get_states(bbox=northrunway)
     if states is not None:
         print("north:    " + str(states))
@@ -108,19 +108,21 @@ def write_northern_csv(states):
         fieldnames = ['icao24', 'flightnumber', 'Country', 'Timestamp', 'latitude', 'longitude', 'baro_altitude', 'vertical_rate', 'on_ground', 'runway', 'state']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         #writer.writeheader()
-        for s in states.states:
-            # append row to csv
-            if(s.callsign != None):
-                if(s.vertical_rate > 0 and s.on_ground == False):
-                    pos = "Takeoff"
-                elif(s.vertical_rate < 0 and s.on_ground == False):
-                    pos = "Landing"
-                else:
-                    pos = "Ground"
-                writer.writerow({'icao24': s.icao24, 'flightnumber': s.callsign, 'Country': s.origin_country,
-                             'Timestamp': unix_to_timestamp(s.last_contact), 'latitude': s.latitude,
-                             'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
-                             'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26R','state': pos})
+        if states is not None:
+
+            for s in states.states:
+                # append row to csv
+                if(s.callsign != None):
+                    if(s.vertical_rate > 0 and s.on_ground == False):
+                        pos = "Takeoff"
+                    elif(s.vertical_rate < 0 and s.on_ground == False):
+                        pos = "Landing"
+                    else:
+                        pos = "Ground"
+                    writer.writerow({'icao24': s.icao24, 'flightnumber': s.callsign, 'Country': s.origin_country,
+                                 'Timestamp': unix_to_timestamp(s.last_contact), 'latitude': s.latitude,
+                                 'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
+                                 'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26R','state': pos})
     return -1;
 
 
@@ -153,7 +155,7 @@ def write_southern_csv(states):
 
 
 def test():
-    api = OpenSkyApi(User, pw)
+    api = OpenSkyApi()
     # bbox = (min latitude, max latitude, min longitude, max longitude)
     time = t.time()
     for n in range(10):

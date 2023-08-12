@@ -17,7 +17,7 @@ Run the App with:
 $ streamlit run .\app\app.py
 ```
 
-Run the Console App with:
+Collect the data with running main.py in /datacollector:
 ```shell
-$ node server.js
+$ python datacollector/main.py
 ```
