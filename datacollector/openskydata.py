@@ -109,20 +109,22 @@ def write_northern_csv(states):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         #writer.writeheader()
         if states is not None:
-
-            for s in states.states:
-                # append row to csv
-                if(s.callsign != None):
-                    if(s.vertical_rate > 0 and s.on_ground == False):
-                        pos = "Takeoff"
-                    elif(s.vertical_rate < 0 and s.on_ground == False):
-                        pos = "Landing"
-                    else:
-                        pos = "Ground"
-                    writer.writerow({'icao24': s.icao24, 'flightnumber': s.callsign, 'Country': s.origin_country,
-                                 'Timestamp': unix_to_timestamp(s.last_contact), 'latitude': s.latitude,
-                                 'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
-                                 'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26R','state': pos})
+            try:
+                for s in states.states:
+                    # append row to csv
+                    if(s.callsign != None):
+                        if(s.vertical_rate > 0 and s.on_ground == False):
+                            pos = "Takeoff"
+                        elif(s.vertical_rate < 0 and s.on_ground == False):
+                            pos = "Landing"
+                        else:
+                            pos = "Ground"
+                        writer.writerow({'icao24': s.icao24, 'flightnumber': s.callsign, 'Country': s.origin_country,
+                                     'Timestamp': unix_to_timestamp(s.last_contact), 'latitude': s.latitude,
+                                     'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
+                                     'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26R','state': pos})
+            except:
+                print("Error writing one plane.")
     return -1;
 
 
@@ -134,23 +136,26 @@ def write_southern_csv(states):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         #writer.writeheader()
         for s in states.states:
+            try:
             # append row to csv
-            if(s.callsign != None and s.callsign != ""):
-                if(s.vertical_rate != None and s.on_ground != None):
-                    if(s.vertical_rate > 0 and s.on_ground == False):
-                        pos = "Takeoff"
-                    elif(s.vertical_rate < 0 and s.on_ground == False):
-                        pos = "Landing"
-                    else:
-                        pos = "Ground"
+                if(s.callsign != None and s.callsign != ""):
+                    if(s.vertical_rate != None and s.on_ground != None):
+                        if(s.vertical_rate > 0 and s.on_ground == False):
+                            pos = "Takeoff"
+                        elif(s.vertical_rate < 0 and s.on_ground == False):
+                            pos = "Landing"
+                        else:
+                            pos = "Ground"
 
-                else:
-                    pos = "Not Avail."
-                if(pos != "Not Avail." and pos != "Ground"):
-                    writer.writerow({'icao24': s.icao24, 'flightnumber': s.callsign, 'Country': s.origin_country,
-                             'Timestamp': unix_to_timestamp(s.last_contact), 'latitude': s.latitude,
-                             'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
-                             'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26L','state': pos})
+                    else:
+                        pos = "Not Avail."
+                    if(pos != "Not Avail." and pos != "Ground"):
+                        writer.writerow({'icao24': s.icao24, 'flightnumber': s.callsign, 'Country': s.origin_country,
+                                 'Timestamp': unix_to_timestamp(s.last_contact), 'latitude': s.latitude,
+                                 'longitude': s.longitude, 'baro_altitude': s.baro_altitude,
+                                 'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26L','state': pos})
+            except:
+                print("Error writing one plane.")
     return -1;
 
 
