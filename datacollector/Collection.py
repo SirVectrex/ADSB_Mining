@@ -9,12 +9,19 @@ def mixedrun():
         try:
 
     # check if time is between 5am and 22pm
-             if (5 <= int(time.strftime("%H")) <= 22):
+            if (5 <= int(time.strftime("%H")) <= 22):
                 # start collecting data
                 openskydata.get_north_runway_once();
                 time.sleep(2)
                 openskydata.get_south_runway_once()
                 time.sleep(2)
+            # else
+            else:
+                # sleep for 6h 55min
+                print("Going to bed until 5am... -  sleep well buddy");
+                time.sleep(24900)
+
+
         except KeyboardInterrupt:
             print("Exiting...")
             break

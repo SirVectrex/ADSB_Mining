@@ -10,7 +10,7 @@ f = open('26L.csv', 'a', newline='')  # southern runway
 
 # define bbox
 northrunway = (48.355026, 48.374598, 11.741354, 11.838376)
-southrunway = (48.332477, 48.354276, 11.705034, 11.833045)
+southrunway = (48.332477, 48.351134, 11.705034, 11.832545)
 
 api = OpenSkyApi()
 
@@ -35,23 +35,33 @@ def get_north_runway_data():
     while True:
         states = api.get_states(time_secs=t.time(), bbox=northrunway)
         if states is not None:
-            print("north:    "+ str(states))
+            print("north:    "+ str(len(states))+  " planes tracked" )
             write_northern_csv(states);
         t.sleep(5)
 
 def get_north_runway_once():
-    print(api)
+    # print(api)
     states = api.get_states(bbox=northrunway)
-    if states is not None:
-        print("north:    " + str(states))
-        write_northern_csv(states);
+    if states is not None and states.states != []:
+        try:
+            print("north:    " + str(len(states.states)) +  " planes tracked at " + str(t.localtime().tm_hour) + ":" + str(t.localtime().tm_min) + ":" + str(t.localtime().tm_sec))
+            write_northern_csv(states);
+
+        except:
+            print("Currently no plane on northern runway")
+            # print(states)
     return -1;
 
 def get_south_runway_once():
-    states = api.get_states(bbox=southrunway)
-    if states is not None:
-        print("south:    " + str(states))
-        write_southern_csv(states);
+    south_states = api.get_states(bbox=southrunway)
+    if south_states is not None and south_states.states != []:
+        try:
+            print("south:    " + str(len(south_states.states)) +  " planes tracked at " + str(t.localtime().tm_hour) + ":" + str(t.localtime().tm_min) + ":" + str(t.localtime().tm_sec))
+            write_southern_csv(south_states);
+            print(south_states)
+        except:
+            print("Currently no plane on southern runway")
+            print(south_states)
     return -1;
 
 
@@ -156,6 +166,7 @@ def write_southern_csv(states):
                                  'vertical_rate': s.vertical_rate, 'on_ground': s.on_ground, 'runway': '26L','state': pos})
             except:
                 print("Error writing one plane.")
+                print(s)
     return -1;
 
 
