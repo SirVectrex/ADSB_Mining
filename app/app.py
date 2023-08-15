@@ -22,16 +22,16 @@ if south:
     # visulize data in streamlit
     st.write(df)
 if north:
-    df = pd.read_csv("./datacollector/26R.csv")
+    df = pd.read_csv("../datacollector/26R.csv")
     # visulize data in streamlit
     st.write(df)
 if both :
     st.write("26L - Southern Runway")
-    df = pd.read_csv("./datacollector/26L.csv")
+    df = pd.read_csv("../datacollector/26L.csv")
     # visulize data in streamlit
     st.write(df)
     st.write("26R - Northern Runway")
-    df2 = pd.read_csv("./datacollector/26R.csv")
+    df2 = pd.read_csv("../datacollector/26R.csv")
     # visulize data in streamlit
     st.write(df2)
 

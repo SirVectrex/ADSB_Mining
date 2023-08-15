@@ -9,7 +9,7 @@ f = open('26R.csv', 'a', newline='')  # northern runway
 f = open('26L.csv', 'a', newline='')  # southern runway
 
 # define bbox
-northrunway = (48.355026, 48.374598, 11.741354, 11.838376)
+northrunway = (48.355026, 48.376550, 11.741354, 11.854014)
 southrunway = (48.332477, 48.351134, 11.705034, 11.832545)
 
 api = OpenSkyApi()
@@ -40,16 +40,20 @@ def get_north_runway_data():
         t.sleep(5)
 
 def get_north_runway_once():
-    # print(api)
+    #print(api)
     states = api.get_states(bbox=northrunway)
     if states is not None and states.states != []:
         try:
             print("north:    " + str(len(states.states)) +  " planes tracked at " + str(t.localtime().tm_hour) + ":" + str(t.localtime().tm_min) + ":" + str(t.localtime().tm_sec))
+            print(states)
             write_northern_csv(states);
 
-        except:
+        except Exception as e:
             print("Currently no plane on northern runway")
-            # print(states)
+            print(e)
+    else:
+        print("Currently no plane on northern runway")
+        print(states)
     return -1;
 
 def get_south_runway_once():
